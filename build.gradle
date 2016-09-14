@@ -38,6 +38,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
         ant.properties['mqsi.deploy'] = 'mqsideploy.exe'
         ant.properties['mqsi.createbar'] = 'mqsicreatebar.exe'
+        ant.properties['mqsi.list'] = 'mqsilist.exe'
         ant.properties['iib.path'] = mqsiprofilePathWin
 
         soapuiExec = soapUIPathWin + '\\testrunner.bat'
@@ -46,6 +47,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
         ant.properties['mqsi.deploy'] = 'mqsideploy'
         ant.properties['mqsi.createbar'] = 'mqsicreatebar'
+        ant.properties['mqsi.list'] = 'mqsilist'
         ant.properties['iib.path'] = mqsiprofilePathMacOS
 
         soapuiExec = soapUIPathMacOS + '/testrunner.sh'
@@ -54,6 +56,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
         ant.properties['mqsi.deploy'] = 'mqsideploy'
         ant.properties['mqsi.createbar'] = 'mqsicreatebar'
+        ant.properties['mqsi.list'] = 'mqsilist'
         ant.properties['iib.path'] = mqsiprofilePathUnix
 
         soapuiExec = soapUIPathUnix + '/testrunner.sh'
@@ -72,13 +75,13 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
       if (soapUIProject != 'None') {
 
-          soapuiParameters = soapUIParams + ' ' + soapUIProject
+        soapuiParameters = soapUIParams + ' ' + soapUIProject
 
-          ant.mruntest(soapuiexec: soapuiExec, params: soapuiParameters)
-          //soapuiXmlToHtml(projectDir)
+        ant.mruntest(soapuiexec: soapuiExec, params: soapuiParameters)
+        //soapuiXmlToHtml(projectDir)
 
       } else {
-          ant.echo('Nothing to do.')
+        ant.echo('Nothing to do.')
       }
     }
   }
@@ -93,7 +96,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         String[] brokerElems
         def iNode, hostName, Port, iServer
 
-        brokers.each{ key, value ->
+        brokers.each { key, value ->
 
           brokerElems = value.split(':')
 
