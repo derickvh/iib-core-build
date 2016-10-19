@@ -13,7 +13,7 @@
 
 	<!-- Parameters for the various MQSI commands -->
 
-	<property name="mqsi.createbar.parameters" value="-data ${basedir} -b ${iib.barfile.param} ${iib.mqsicreatebar.params}" />
+	<property name="mqsi.createbar.parameters" value="-data ${basedir} -b ${iib.barfile.param} ${iib.mqsicreatebar.params} -cleanBuild" />
 	<property name="mqsi.applybaroverride.parameters" value="-b ${iib.barfile.param} -p ${override.file} -r" />
 
 	<!--Set property deploy.only if an existing BAR file is up to date -->
@@ -103,15 +103,6 @@
 			</exec>
 		</sequential>
 	</macrodef>
-
-	<target name="testHTTP" depends="multiDeploy">
-  <echo message="TEST target starting ..." />
-  <java classname="demo.iib.ci.TestClient">
-    <classpath>
-      <pathelement location="${basedir}${file.separator}TestClient${file.separator}bin" />
-    </classpath>
-  </java>
-</target>
 
 	<!-- TODO. The deployed BAR file to be copied to an object store -->
 
