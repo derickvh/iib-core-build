@@ -34,6 +34,10 @@ switch (iibEnv) {
 
   // Set Ant properties based on underlying platform
 
+  /*
+		<property name="mqsi.createbar.parameters" value="-data ${basedir} -b ${iib.barfile.param} ${iib.mqsicreatebar.params} -cleanBuild" />
+  */
+
 if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
         ant.properties['mqsi.deployw'] = 'mqsideployw.bat'
@@ -65,10 +69,10 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         soapuiExec = soapUIPathUnix + '/testrunner.sh'
 }
 
-  ant.properties['iib.barfile.dir'] = barfileDir
-  ant.properties['iib.bar.version'] = barFileVersion
-  ant.properties['iib.bar'] = appName
-  ant.properties['iib.mqsicreatebar.params'] = paramsMQSICreateBarfile
+  //ant.properties['iib.barfile.dir'] = barfileDir
+  //ant.properties['iib.bar.version'] = barFileVersion
+  //ant.properties['iib.bar'] = appName
+  //ant.properties['iib.mqsicreatebar.params'] = paramsMQSICreateBarfile
 
   ant.importBuild 'build.xml'
 
@@ -88,11 +92,66 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
       }
     }
   }
+  /*
+   * How do we solve the up-to-date problem in gradle?
+   */
+  task multiBuild() {
 
-    task multiDeploy() {
+    //First, extract configurations from config file
+    def config = new ConfigSlurper().parse(new File("$projectDir/build.config").toURL())
+    ant.echo("Build configuration file loaded ...")
 
-      File inFile = file('broker.properties')
-      Properties brokers = readPropsFile(inFile)
+    doLast {
+
+      config.each { k,v  -> println("${k}: ${v.applications}")
+
+      def host, port, broker, execgroup, oFile
+      def barfile = "$projectDir/BARfiles/${v.barname}-${v.version}.bar"
+      def cbParams = "-data $projectDir -b $barfile -cleanBuild -a "
+      def orParams = "-b $barfile -r -p "
+
+        //Mandatory. There must at least be one application
+
+        v.applications.each { app -> cbParams += "$app "}
+
+        if (!v.libraries.isEmpty()) {
+
+          cbParams += " -l "
+          v.libraries.each {lib -> cbParams += "$lib "}
+        }
+        if (!v.projects.isEmpty()) {
+
+          cbParams += " -p "
+          v.projects.each { proj -> cbParams += "$proj "}
+        }
+        if (v.deployAsSource == 'true') { cbParams += " -deployAsSource "}
+
+        //ant.mcompile(createbarParams: cbParams)
+
+        v.overrideFiles.each {key, value -> if (v.environment == key) {
+          oFile = value}
+        }
+        orParams += oFile
+        ant.moverride(applyOverrideParams: orParams)
+
+        v.integrationNodes.each {name, value ->
+
+        println("${value.host}, ${value.port}, ${value.intNode}, ${value.intServer}, ${barfile}")
+
+          /*ant.mdeploy(inode: value.intNode,
+                      hostname: value.host,
+                      port: value.port,
+                      execgroup: value.intServer,
+                      barfile: barfile)*/
+        }
+      }
+    }
+  }
+
+  task multiDeploy() {
+
+    File inFile = file('broker.properties')
+    Properties brokers = readPropsFile(inFile)
 
       doLast {
 
@@ -165,5 +224,5 @@ tasks.runSoapUI {
   description "Runs a SoapUI Test Project and generates a junit-style test report."
 }
 
-multiDeploy.dependsOn('compile', 'override')
+//multiDeploy.dependsOn('compile', 'override')
 runSoapUI.dependsOn('multiDeploy')
