@@ -3,7 +3,7 @@
 
 	<!-- Start of Global Properties -->
 
-	<property name="barfile.dir" location="${basedir}${file.separator}${iib.barfile.dir}" />
+	<property name="barfile.dir" location="${workspace.dir}${file.separator}${iib.barfile.dir}" />
 	<property name="iib.barfile.param" value="${barfile.dir}${file.separator}${iib.bar}_${iib.bar.version}.bar" />
 	<property name="override.file" location="${basedir}${file.separator}${iib.override.file}" />
 
@@ -13,7 +13,7 @@
 
 	<!-- Parameters for the various MQSI commands -->
 
-	<property name="mqsi.createbar.parameters" value="-data ${basedir} -b ${iib.barfile.param} ${iib.mqsicreatebar.params} -cleanBuild" />
+	<property name="mqsi.createbar.parameters" value="-data ${workspace.dir} -b ${iib.barfile.param} ${iib.mqsicreatebar.params} -cleanBuild" />
 	<property name="mqsi.applybaroverride.parameters" value="-b ${iib.barfile.param} -p ${override.file} -r" />
 
 	<!--Set property deploy.only if an existing BAR file is up to date -->
