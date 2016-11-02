@@ -2,30 +2,28 @@
 <project name="iib.build" basedir=".">
 
 	<!-- Start of Global Properties -->
-  <!--
+
 	<property name="barfile.dir" location="${basedir}${file.separator}${iib.barfile.dir}" />
 	<property name="iib.barfile.param" value="${barfile.dir}${file.separator}${iib.bar}_${iib.bar.version}.bar" />
 	<property name="override.file" location="${basedir}${file.separator}${iib.override.file}" />
-	-->
+
 	<!-- Java class names of applybaroverride command -->
 
 	<property name="mqsi.applybaroverride" value="com.ibm.broker.config.util.ApplyBarOverride" />
 
 	<!-- Parameters for the various MQSI commands -->
-	<!--
+
 	<property name="mqsi.createbar.parameters" value="-data ${basedir} -b ${iib.barfile.param} ${iib.mqsicreatebar.params} -cleanBuild" />
 	<property name="mqsi.applybaroverride.parameters" value="-b ${iib.barfile.param} -p ${override.file} -r" />
-	-->
 
 	<!--Set property deploy.only if an existing BAR file is up to date -->
-	<!--
+
 	<uptodate property="deploy.only" targetfile="${iib.barfile.param}">
 		<srcfiles dir="${basedir}" includes="**/*.msgflow" />
 		<srcfiles dir="${basedir}" includes="**/*.subflow" />
 		<srcfiles dir="${basedir}" includes="**/*.java" />
 		<srcfiles dir="${basedir}" includes="**/*.esql" />
 	</uptodate>
-	-->
 
 	<!-- Create build start time stamp -->
 
@@ -37,7 +35,6 @@
 
 	<echo message="Build start time: ${time.stamp}" />
 
-<!--
 	<target name="cleanup" description="Deletes compiled bar file for this specific application or project." unless="${deploy.only}">
 		<echo message="CLEANUP target is starting ...${line.separator}" />
 		<delete failonerror="false" verbose="true">
@@ -72,39 +69,8 @@
 			</fileset>
   		</classpath>
  		</java>
+
 	</target>
--->
-	<macrodef name="moverride">
-		<attribute name="applyOverrideParams" />
-
-		<sequential>
-			<echo message="OVERRIDE target starting ...${line.separator}" />
-			<echo message="Command line: java -cp ... ${mqsi.applybaroverride}  @{applyOverrideParams}${line.separator}" />
-			<java classname="${mqsi.applybaroverride}" failonerror="true" fork="true">
-	  		<arg line="@{applyOverrideParams} -runtime" />
-	  		<classpath>
-	   			<fileset dir="${iib.path}${file.separator}server${file.separator}classes">
-	    				<include name="*.jar"/>
-	   			</fileset>
-				<fileset dir="${iib.path}${file.separator}common${file.separator}classes">
-					<include name="*.jar"/>
-				</fileset>
-	  		</classpath>
-	 		</java>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="mcompile">
-		<attribute name="createbarParams" />
-
-		<sequential>
-			<echo message="COMPILE target starting ...${line.separator}" />
-			<echo message="Command line: ${mqsi.createbar} @{createbarParams}${line.separator}" />
-			<exec executable="${iib.path}${file.separator}tools${file.separator}${mqsi.createbar}" failonerror="true">
-				<arg line="@{createbarParams}" />
-			</exec>
-		</sequential>
-	</macrodef>
 
 	<macrodef name="mruntest">
 
@@ -125,8 +91,8 @@
 		<attribute name="inode" />
 		<attribute name="hostname" default="localhost"/>
 		<attribute name="port" default="4414" />
+		<attribute name="barfile" default="${iib.barfile.param}" />
 		<attribute name="execgroup" default="default"/>
-		<attribute name="barfile" />
 
 		<sequential>
 			<echo message="MULTI.DEPLOY target starting ...${line.separator}" />
