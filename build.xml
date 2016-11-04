@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="iib.build" basedir=".">
+<project name="iib.build">
 
 	<!-- Start of Global Properties -->
 
 	<property name="barfile.dir" location="${basedir}${file.separator}${iib.barfile.dir}" />
-	<property name="iib.barfile.param" value="${barfile.dir}${file.separator}${iib.bar}_${iib.bar.version}.bar" />
+	<property name="iib.barfile.param" value="${barfile.dir}${file.separator}${iib.bar}-${iib.bar.version}.bar" />
 	<property name="override.file" location="${basedir}${file.separator}${iib.override.file}" />
 
 	<!-- Java class names of applybaroverride command -->

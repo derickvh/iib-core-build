@@ -1,24 +1,10 @@
 //build.gradle
 
-  repositories {
-      maven { url "http://repo.maven.apache.org/maven2" }
-    }
-
-    configurations {
-      antClasspath
-    }
-
-    // dependency for XMLResultAggregator task
-
-    dependencies {
-      antClasspath 'org.apache.ant:ant-junit:1.8.2'
-    }
-
 def iibEnv, appName, barfileDir, version, integrationNodes, paramsMQSICreateBarfile, soapUIProject, soapUIParams, soapuiExec
 
 task loadConfiguration {
 
-  description 'Loads Build Configuration from build.config file.'
+  description 'Loads IIB Project Build Configuration from build.config file.'
 
   def config = new ConfigSlurper().parse(file('build.config').toURL())
   ant.echo("Build configuration file loaded ...")
@@ -83,6 +69,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         soapuiExec = soapUIPathUnix + '/testrunner.sh'
       }
 
+    ant.properties['basedir'] = projectDir.getParent()
     ant.properties['iib.barfile.dir'] = barfileDir
     ant.properties['iib.bar.version'] = version
     ant.properties['iib.bar'] = appName
@@ -98,7 +85,6 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
         def soapuiParameters = soapUIParams + ' ' + soapUIProject
         ant.mruntest(soapuiexec: soapuiExec, params: soapuiParameters)
-        //soapuiXmlToHtml(projectDir)
 
       } else {
         ant.echo('Nothing to do ...')
@@ -119,45 +105,6 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
           }
         }
       }
-
-//------ Functions used by tasks below this line ------
-
-// function to perform XSLT transformation of soapUI xml test report to html
-/*
- * Thanks to ... http://stackoverflow.com/questions/35770615/need-through-guidance-on-gradle-script-to-execute-soapui-project-xmls-and-genera/35774134#35774134
-*/
-
-def soapuiXmlToHtml(resultsDir) {
-
-    def targetDir = new File(resultsDir, 'html')
-
-    ant.taskdef(
-        name: 'junitreport',
-        classname: 'org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator',
-        classpath: configurations.antClasspath.asPath
-    )
-
-    ant.junitreport(todir: resultsDir) {
-        fileset(dir: resultsDir, includes: 'TEST-*.xml')
-        report(todir: targetDir, format: "noframes")
-    }
-}
-
-/*
-
-Properties readPropsFile(File fProps) {
-
- ant.echo('Reading a properties file.')
-
- if (!fProps.exists()) {
-     throw new GradleException(
-     "Required properties file does not exist: $fProps.canonicalPath")
- }
-  Properties props = new Properties()
-  fProps.withInputStream { stream -> props.load(stream) }
-  return props
-}
-*/
 
 tasks.multiDeploy {
 
