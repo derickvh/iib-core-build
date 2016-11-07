@@ -5,7 +5,6 @@
 
 	<property name="barfile.dir" location="${workspace.dir}${file.separator}${iib.barfile.dir}" />
 	<property name="iib.barfile.param" value="${barfile.dir}${file.separator}${iib.bar}-${iib.bar.version}.bar" />
-
 	<property name="override.file" location="${basedir}${file.separator}${iib.override.file}" />
 
 	<!-- Java class names of applybaroverride command -->

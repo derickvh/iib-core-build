@@ -69,11 +69,11 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         soapuiExec = soapUIPathUnix + '/testrunner.sh'
       }
 
-  ant.properties['workspace.dir'] = projectDir.getParent()
-  ant.properties['iib.barfile.dir'] = barfileDir
-  ant.properties['iib.bar.version'] = version
-  ant.properties['iib.bar'] = appName
-  ant.properties['iib.mqsicreatebar.params'] = paramsMQSICreateBarfile
+    ant.properties['workspace.dir'] = projectDir.getParent()
+    ant.properties['iib.barfile.dir'] = barfileDir
+    ant.properties['iib.bar.version'] = version
+    ant.properties['iib.bar'] = appName
+    ant.properties['iib.mqsicreatebar.params'] = paramsMQSICreateBarfile
 
     ant.importBuild 'build.xml'
 
