@@ -5,6 +5,7 @@
 
 	<property name="barfile.dir" location="${workspace.dir}${file.separator}${iib.barfile.dir}" />
 	<property name="iib.barfile.param" value="${barfile.dir}${file.separator}${iib.bar}-${iib.bar.version}.bar" />
+
 	<property name="override.file" location="${basedir}${file.separator}${iib.override.file}" />
 
 	<!-- Java class names of applybaroverride command -->
@@ -23,6 +24,11 @@
 		<srcfiles dir="${basedir}" includes="**/*.subflow" />
 		<srcfiles dir="${basedir}" includes="**/*.java" />
 		<srcfiles dir="${basedir}" includes="**/*.esql" />
+		<srcfiles dir="${basedir}" includes="**/*.xml" />
+		<srcfiles dir="${basedir}" includes="**/*.xsd" />
+		<srcfiles dir="${basedir}" includes="**/*.wsdl" />
+		<srcfiles dir="${basedir}" includes="**/*.json" />
+		<srcfiles dir="${basedir}" includes="**/*.map" />
 	</uptodate>
 
 	<!-- Create build start time stamp -->
@@ -58,7 +64,7 @@
 		<echo message="OVERRIDE target starting ...${line.separator}" />
 		<echo message="Command line: java -cp ... ${mqsi.applybaroverride}  ${mqsi.applybaroverride.parameters}${line.separator}" />
 
-		<java classname="com.ibm.broker.config.util.ApplyBarOverride" failonerror="true" fork="true">
+		<java classname="${mqsi.applybaroverride}" failonerror="true" fork="true">
   		<arg line="${mqsi.applybaroverride.parameters} -runtime" />
   		<classpath>
    			<fileset dir="${iib.path}${file.separator}server${file.separator}classes">
@@ -69,7 +75,6 @@
 			</fileset>
   		</classpath>
  		</java>
-
 	</target>
 
 	<macrodef name="mruntest">

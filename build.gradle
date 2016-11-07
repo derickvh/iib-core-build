@@ -1,20 +1,28 @@
 //build.gradle
 
-  repositories {
-      maven { url "http://repo.maven.apache.org/maven2" }
-    }
+def iibEnv, appName, barfileDir, version, integrationNodes, paramsMQSICreateBarfile, soapUIProject, soapUIParams, soapuiExec
 
-    configurations {
-      antClasspath
-    }
+task loadConfiguration {
 
-    // dependency for XMLResultAggregator task
+  description 'Loads IIB Project Build Configuration from build.config file.'
 
-    dependencies {
-      antClasspath 'org.apache.ant:ant-junit:1.8.2'
-    }
+  def config = new ConfigSlurper().parse(file('build.config').toURL())
+  ant.echo("Build configuration file loaded ...")
 
-// Select appropriate overrride properties file based on target deployment environment
+  config.each { k,v  ->
+
+    appName = v.appName
+    iibEnv = v.iibEnv
+    barfileDir = v.barfileDir
+    version = v.version
+    paramsMQSICreateBarfile = v.paramsMQSICreateBarfile
+    soapUIProject = v.soapUIProject
+    soapUIParams = v.soapUIParams
+    integrationNodes = v.integrationNodes
+  }
+}
+
+/* Select appropriate override properties file based on target deployment environment */
 
 switch (iibEnv) {
 
@@ -27,10 +35,6 @@ switch (iibEnv) {
          default:
          ant.properties['iib.override.file'] = 'override.properties'
 }
-
-  // Define parameters for use by runSoapUI task
-
-  String soapuiExec, soapuiParameters
 
   // Set Ant properties based on underlying platform
 
@@ -63,7 +67,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
         ant.properties['cmd.exec'] = projectDir.getPath() + '/mqsideployw'
 
         soapuiExec = soapUIPathUnix + '/testrunner.sh'
-}
+      }
 
   ant.properties['workspace.dir'] = projectDir.getParent()
   ant.properties['iib.barfile.dir'] = barfileDir
@@ -71,7 +75,7 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
   ant.properties['iib.bar'] = appName
   ant.properties['iib.mqsicreatebar.params'] = paramsMQSICreateBarfile
 
-  ant.importBuild 'build.xml'
+    ant.importBuild 'build.xml'
 
   task runSoapUI {
 
@@ -79,82 +83,28 @@ if (org.gradle.internal.os.OperatingSystem.current().windows) {
 
       if (soapUIProject != 'None') {
 
-        soapuiParameters = soapUIParams + ' ' + soapUIProject
-
+        def soapuiParameters = soapUIParams + ' ' + soapUIProject
         ant.mruntest(soapuiexec: soapuiExec, params: soapuiParameters)
-        //soapuiXmlToHtml(projectDir)
 
       } else {
-        ant.echo('Nothing to do.')
+        ant.echo('Nothing to do ...')
       }
     }
   }
 
-    task multiDeploy() {
-
-      File inFile = file('broker.properties')
-      Properties brokers = readPropsFile(inFile)
+  task multiDeploy() {
 
       doLast {
 
-        String[] brokerElems
-        def iNode, hostName, Port, iServer
+          integrationNodes.each {name, value ->
 
-        brokers.each { key, value ->
-
-          brokerElems = value.split(':')
-
-          // Not very elegant, but here goes ...
-          iNode = brokerElems[0]
-          hostName = brokerElems[1]
-          Port = brokerElems[2]
-          iServer = brokerElems[3]
-
-          ant.mdeploy(inode: iNode,
-                  hostname: hostName,
-                  port: Port,
-                  execgroup: iServer)
-                }
-              }
-            }
-
-//------ Functions used by tasks below this line ------
-
-// function to perform XSLT transformation of soapUI xml test report to html
-/*
- * Thanks to ... http://stackoverflow.com/questions/35770615/need-through-guidance-on-gradle-script-to-execute-soapui-project-xmls-and-genera/35774134#35774134
-*/
-
-def soapuiXmlToHtml(resultsDir) {
-
-    def targetDir = new File(resultsDir, 'html')
-
-    ant.taskdef(
-        name: 'junitreport',
-        classname: 'org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator',
-        classpath: configurations.antClasspath.asPath
-    )
-
-    ant.junitreport(todir: resultsDir) {
-        fileset(dir: resultsDir, includes: 'TEST-*.xml')
-        report(todir: targetDir, format: "noframes")
-    }
-}
-
-//------
-
-Properties readPropsFile(File fProps) {
-
- ant.echo('Reading a properties file.')
-
- if (!fProps.exists()) {
-     throw new GradleException(
-     "Required properties file does not exist: $fProps.canonicalPath")
- }
-  Properties props = new Properties()
-  fProps.withInputStream { stream -> props.load(stream) }
-  return props
-}
+            ant.mdeploy(inode: value.intNode,
+                        hostname: value.host,
+                        port: value.port,
+                        execgroup: value.intServer)
+          }
+        }
+      }
 
 tasks.multiDeploy {
 
